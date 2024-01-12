@@ -7,19 +7,19 @@
 #include "altera_avalon_pio_regs.h"
 
 volatile __uint8_t speed;
+__uint8_t data = 0x01; 
 
 static void irqhandler_bouton_key1(void* context, alt_u32 id)
 {
     //IOWR_ALTERA_AVALON_PIO_EDGE_CAP(PIO_1_BASE, 0x1); ici on ne reinitialise pas pour garder l irq
 
     // Action de réponse à l'interruption
-    unsigned int data = 0x01; 
-        while(data!=0x100) {
-            IOWR_ALTERA_AVALON_PIO_DATA(PIO_0_BASE,data);
-            usleep(400000/speed);
-            data = data << 1;
-        }
+    if (data == 0x80){
         data = 0x01;
+    }
+    IOWR_ALTERA_AVALON_PIO_DATA(PIO_0_BASE,data);
+    usleep(400000/speed);
+    data = data << 1;
 }
 
 static void irqhandler_switch(void* context, alt_u32 id)
@@ -36,6 +36,7 @@ static void irqhandler_switch(void* context, alt_u32 id)
 
 int main()
 {
+    unsigned int data = 0x01; 
     alt_printf("main() started\n");
     speed = 0x01;
     // Configurer le bouton pour générer des interruptions
