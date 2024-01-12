@@ -46,5 +46,8 @@ Cette interruption à un niveau de priorité supérieur à celle du chenillards.
    - ***IOWR_ALTERA_AVALON_PIO_EDGE_CAP(PIO_2_BASE, 0x0F);*** cette ligne permet de configurer le type d’évènement qui declenchera l’interruption (ici un changement d’etat d’au moins un des 4 switchs)
    - ***alt_irq_register()*** Permet d’enregister les interruptions dans le gestionnaire d’interruption.
 
+## Résultat
+https://github.com/ESN2024/roche_lab1/assets/116710033/1f55b0bf-e4fa-49d8-8ce9-3df458836637
+
 ## Conclusion
 Discussion sur les problèmes de priorité des interruptions et des flags `cap edge` à 1.
