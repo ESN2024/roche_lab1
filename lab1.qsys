@@ -439,7 +439,7 @@
   <parameter name="width" value="1" />
  </module>
  <module name="pio_2" kind="altera_avalon_pio" version="18.1" enabled="1">
-  <parameter name="bitClearingEdgeCapReg" value="false" />
+  <parameter name="bitClearingEdgeCapReg" value="true" />
   <parameter name="bitModifyingOutReg" value="false" />
   <parameter name="captureEdge" value="true" />
   <parameter name="clockRate" value="50000000" />
@@ -546,14 +546,14 @@
    version="18.1"
    start="nios2_gen2_0.irq"
    end="pio_1.irq">
-  <parameter name="irqNumber" value="1" />
+  <parameter name="irqNumber" value="2" />
  </connection>
  <connection
    kind="interrupt"
    version="18.1"
    start="nios2_gen2_0.irq"
    end="pio_2.irq">
-  <parameter name="irqNumber" value="2" />
+  <parameter name="irqNumber" value="1" />
  </connection>
  <connection
    kind="reset"
