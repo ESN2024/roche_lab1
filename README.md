@@ -33,12 +33,13 @@ Le programme utilise deux types d'interruptions :
 
 ## Langage C
 Le code C se divise en trois parties :
-1. `irqhandler_bouton_key1()` : Routine d’interruption du bouton KEY1, le flag d’interruption n’est jamais remis à 0. C’est-à-dire que le programme boucle infiniment sur cette routine au déclenchement du bouton. Cette routine écrit dans le PIO_O_1 la données data qui est décalé à chaque occurrence de cette routine ou mis à 0x01 si data = 0x08. Ceci décrit le fonctionnement du chenillards
+1. `irqhandler_bouton_key1()` : Routine d’interruption du bouton KEY1, le flag d’interruption n’est jamais remis à 0. C’est-à-dire que le programme boucle infiniment sur cette routine au déclenchement du bouton. Cette routine écrit dans le PIO_O_1 la données data qui est décalé à chaque occurrence de cette routine ou mis à 0x01 si data = 0x08. Ceci décrit le fonctionnement du chenillards. La vitesse du chenillards est géré par la fonction de pause **usleep()** suivant la valeur de speed. Quand speed est petit (=1) la vitesse du chenillard est lente et inversement.
 
-La vitesse du chenillards est géré par la fonction de pause usleep() suivant la valeur de speed. Quand speed est petit (=1) la vitesse du chenillard est lente et inversement.
+2. `irqhandler_bouton_key1()` : Routine d’interruption des 4 premiers switchs. Cette fois ci le flag d’interruption est réinitialiser pour que la routine s’execute à chaque changement d’état des switchs. La variable speed prend la valeur des 4 switch en rajoutant 1. Cela permet d’éviter que speed soit égale à 0 et que cela viennent créer des problème à l’appelle de usleep(400000/speed).
+Cette interruption à un niveau de priorité supérieur à celle du chenillards.
 
-2. Gestion de la vitesse du chenillard avec la fonction `usleep()` selon la valeur de `speed`.
-3. `irqhandler_switch()` : Routine d'interruption des 4 premiers switchs.
+3. `main()` : Programme principal conçu pour enregistrer les interruptions du bouton et des switchs permettant le bon fonctionnement du système.
+   eddeded
 
 ## Conclusion
 Discussion sur les problèmes de priorité des interruptions et des flags `cap edge` à 1.
