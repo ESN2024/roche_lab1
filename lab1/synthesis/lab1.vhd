@@ -8,9 +8,11 @@ use IEEE.numeric_std.all;
 
 entity lab1 is
 	port (
-		clk_clk                          : in  std_logic                    := '0'; --                       clk.clk
-		pio_0_external_connection_export : out std_logic_vector(7 downto 0);        -- pio_0_external_connection.export
-		reset_reset_n                    : in  std_logic                    := '0'  --                     reset.reset_n
+		clk_clk                          : in  std_logic                    := '0';             --                       clk.clk
+		pio_0_external_connection_export : out std_logic_vector(7 downto 0);                    -- pio_0_external_connection.export
+		pio_1_external_connection_export : in  std_logic                    := '0';             -- pio_1_external_connection.export
+		pio_2_external_connection_export : in  std_logic_vector(7 downto 0) := (others => '0'); -- pio_2_external_connection.export
+		reset_reset_n                    : in  std_logic                    := '0'              --                     reset.reset_n
 	);
 end entity lab1;
 
@@ -90,6 +92,34 @@ architecture rtl of lab1 is
 		);
 	end component lab1_pio_0;
 
+	component lab1_pio_1 is
+		port (
+			clk        : in  std_logic                     := 'X';             -- clk
+			reset_n    : in  std_logic                     := 'X';             -- reset_n
+			address    : in  std_logic_vector(1 downto 0)  := (others => 'X'); -- address
+			write_n    : in  std_logic                     := 'X';             -- write_n
+			writedata  : in  std_logic_vector(31 downto 0) := (others => 'X'); -- writedata
+			chipselect : in  std_logic                     := 'X';             -- chipselect
+			readdata   : out std_logic_vector(31 downto 0);                    -- readdata
+			in_port    : in  std_logic                     := 'X';             -- export
+			irq        : out std_logic                                         -- irq
+		);
+	end component lab1_pio_1;
+
+	component lab1_pio_2 is
+		port (
+			clk        : in  std_logic                     := 'X';             -- clk
+			reset_n    : in  std_logic                     := 'X';             -- reset_n
+			address    : in  std_logic_vector(1 downto 0)  := (others => 'X'); -- address
+			write_n    : in  std_logic                     := 'X';             -- write_n
+			writedata  : in  std_logic_vector(31 downto 0) := (others => 'X'); -- writedata
+			chipselect : in  std_logic                     := 'X';             -- chipselect
+			readdata   : out std_logic_vector(31 downto 0);                    -- readdata
+			in_port    : in  std_logic_vector(7 downto 0)  := (others => 'X'); -- export
+			irq        : out std_logic                                         -- irq
+		);
+	end component lab1_pio_2;
+
 	component lab1_mm_interconnect_0 is
 		port (
 			clk_0_clk_clk                                  : in  std_logic                     := 'X';             -- clk
@@ -133,7 +163,17 @@ architecture rtl of lab1 is
 			pio_0_s1_write                                 : out std_logic;                                        -- write
 			pio_0_s1_readdata                              : in  std_logic_vector(31 downto 0) := (others => 'X'); -- readdata
 			pio_0_s1_writedata                             : out std_logic_vector(31 downto 0);                    -- writedata
-			pio_0_s1_chipselect                            : out std_logic                                         -- chipselect
+			pio_0_s1_chipselect                            : out std_logic;                                        -- chipselect
+			pio_1_s1_address                               : out std_logic_vector(1 downto 0);                     -- address
+			pio_1_s1_write                                 : out std_logic;                                        -- write
+			pio_1_s1_readdata                              : in  std_logic_vector(31 downto 0) := (others => 'X'); -- readdata
+			pio_1_s1_writedata                             : out std_logic_vector(31 downto 0);                    -- writedata
+			pio_1_s1_chipselect                            : out std_logic;                                        -- chipselect
+			pio_2_s1_address                               : out std_logic_vector(1 downto 0);                     -- address
+			pio_2_s1_write                                 : out std_logic;                                        -- write
+			pio_2_s1_readdata                              : in  std_logic_vector(31 downto 0) := (others => 'X'); -- readdata
+			pio_2_s1_writedata                             : out std_logic_vector(31 downto 0);                    -- writedata
+			pio_2_s1_chipselect                            : out std_logic                                         -- chipselect
 		);
 	end component lab1_mm_interconnect_0;
 
@@ -142,6 +182,8 @@ architecture rtl of lab1 is
 			clk           : in  std_logic                     := 'X'; -- clk
 			reset         : in  std_logic                     := 'X'; -- reset
 			receiver0_irq : in  std_logic                     := 'X'; -- irq
+			receiver1_irq : in  std_logic                     := 'X'; -- irq
+			receiver2_irq : in  std_logic                     := 'X'; -- irq
 			sender_irq    : out std_logic_vector(31 downto 0)         -- irq
 		);
 	end component lab1_irq_mapper;
@@ -317,7 +359,19 @@ architecture rtl of lab1 is
 	signal mm_interconnect_0_pio_0_s1_address                              : std_logic_vector(1 downto 0);  -- mm_interconnect_0:pio_0_s1_address -> pio_0:address
 	signal mm_interconnect_0_pio_0_s1_write                                : std_logic;                     -- mm_interconnect_0:pio_0_s1_write -> mm_interconnect_0_pio_0_s1_write:in
 	signal mm_interconnect_0_pio_0_s1_writedata                            : std_logic_vector(31 downto 0); -- mm_interconnect_0:pio_0_s1_writedata -> pio_0:writedata
+	signal mm_interconnect_0_pio_1_s1_chipselect                           : std_logic;                     -- mm_interconnect_0:pio_1_s1_chipselect -> pio_1:chipselect
+	signal mm_interconnect_0_pio_1_s1_readdata                             : std_logic_vector(31 downto 0); -- pio_1:readdata -> mm_interconnect_0:pio_1_s1_readdata
+	signal mm_interconnect_0_pio_1_s1_address                              : std_logic_vector(1 downto 0);  -- mm_interconnect_0:pio_1_s1_address -> pio_1:address
+	signal mm_interconnect_0_pio_1_s1_write                                : std_logic;                     -- mm_interconnect_0:pio_1_s1_write -> mm_interconnect_0_pio_1_s1_write:in
+	signal mm_interconnect_0_pio_1_s1_writedata                            : std_logic_vector(31 downto 0); -- mm_interconnect_0:pio_1_s1_writedata -> pio_1:writedata
+	signal mm_interconnect_0_pio_2_s1_chipselect                           : std_logic;                     -- mm_interconnect_0:pio_2_s1_chipselect -> pio_2:chipselect
+	signal mm_interconnect_0_pio_2_s1_readdata                             : std_logic_vector(31 downto 0); -- pio_2:readdata -> mm_interconnect_0:pio_2_s1_readdata
+	signal mm_interconnect_0_pio_2_s1_address                              : std_logic_vector(1 downto 0);  -- mm_interconnect_0:pio_2_s1_address -> pio_2:address
+	signal mm_interconnect_0_pio_2_s1_write                                : std_logic;                     -- mm_interconnect_0:pio_2_s1_write -> mm_interconnect_0_pio_2_s1_write:in
+	signal mm_interconnect_0_pio_2_s1_writedata                            : std_logic_vector(31 downto 0); -- mm_interconnect_0:pio_2_s1_writedata -> pio_2:writedata
 	signal irq_mapper_receiver0_irq                                        : std_logic;                     -- jtag_uart_0:av_irq -> irq_mapper:receiver0_irq
+	signal irq_mapper_receiver1_irq                                        : std_logic;                     -- pio_1:irq -> irq_mapper:receiver1_irq
+	signal irq_mapper_receiver2_irq                                        : std_logic;                     -- pio_2:irq -> irq_mapper:receiver2_irq
 	signal nios2_gen2_0_irq_irq                                            : std_logic_vector(31 downto 0); -- irq_mapper:sender_irq -> nios2_gen2_0:irq
 	signal rst_controller_reset_out_reset                                  : std_logic;                     -- rst_controller:reset_out -> [irq_mapper:reset, mm_interconnect_0:nios2_gen2_0_reset_reset_bridge_in_reset_reset, onchip_memory2_0:reset, rst_controller_reset_out_reset:in, rst_translator:in_reset]
 	signal rst_controller_reset_out_reset_req                              : std_logic;                     -- rst_controller:reset_req -> [nios2_gen2_0:reset_req, onchip_memory2_0:reset_req, rst_translator:reset_req_in]
@@ -327,8 +381,10 @@ architecture rtl of lab1 is
 	signal mm_interconnect_0_jtag_uart_0_avalon_jtag_slave_read_ports_inv  : std_logic;                     -- mm_interconnect_0_jtag_uart_0_avalon_jtag_slave_read:inv -> jtag_uart_0:av_read_n
 	signal mm_interconnect_0_jtag_uart_0_avalon_jtag_slave_write_ports_inv : std_logic;                     -- mm_interconnect_0_jtag_uart_0_avalon_jtag_slave_write:inv -> jtag_uart_0:av_write_n
 	signal mm_interconnect_0_pio_0_s1_write_ports_inv                      : std_logic;                     -- mm_interconnect_0_pio_0_s1_write:inv -> pio_0:write_n
+	signal mm_interconnect_0_pio_1_s1_write_ports_inv                      : std_logic;                     -- mm_interconnect_0_pio_1_s1_write:inv -> pio_1:write_n
+	signal mm_interconnect_0_pio_2_s1_write_ports_inv                      : std_logic;                     -- mm_interconnect_0_pio_2_s1_write:inv -> pio_2:write_n
 	signal rst_controller_reset_out_reset_ports_inv                        : std_logic;                     -- rst_controller_reset_out_reset:inv -> [jtag_uart_0:rst_n, nios2_gen2_0:reset_n]
-	signal rst_controller_001_reset_out_reset_ports_inv                    : std_logic;                     -- rst_controller_001_reset_out_reset:inv -> pio_0:reset_n
+	signal rst_controller_001_reset_out_reset_ports_inv                    : std_logic;                     -- rst_controller_001_reset_out_reset:inv -> [pio_0:reset_n, pio_1:reset_n, pio_2:reset_n]
 
 begin
 
@@ -403,6 +459,32 @@ begin
 			out_port   => pio_0_external_connection_export              -- external_connection.export
 		);
 
+	pio_1 : component lab1_pio_1
+		port map (
+			clk        => clk_clk,                                      --                 clk.clk
+			reset_n    => rst_controller_001_reset_out_reset_ports_inv, --               reset.reset_n
+			address    => mm_interconnect_0_pio_1_s1_address,           --                  s1.address
+			write_n    => mm_interconnect_0_pio_1_s1_write_ports_inv,   --                    .write_n
+			writedata  => mm_interconnect_0_pio_1_s1_writedata,         --                    .writedata
+			chipselect => mm_interconnect_0_pio_1_s1_chipselect,        --                    .chipselect
+			readdata   => mm_interconnect_0_pio_1_s1_readdata,          --                    .readdata
+			in_port    => pio_1_external_connection_export,             -- external_connection.export
+			irq        => irq_mapper_receiver1_irq                      --                 irq.irq
+		);
+
+	pio_2 : component lab1_pio_2
+		port map (
+			clk        => clk_clk,                                      --                 clk.clk
+			reset_n    => rst_controller_001_reset_out_reset_ports_inv, --               reset.reset_n
+			address    => mm_interconnect_0_pio_2_s1_address,           --                  s1.address
+			write_n    => mm_interconnect_0_pio_2_s1_write_ports_inv,   --                    .write_n
+			writedata  => mm_interconnect_0_pio_2_s1_writedata,         --                    .writedata
+			chipselect => mm_interconnect_0_pio_2_s1_chipselect,        --                    .chipselect
+			readdata   => mm_interconnect_0_pio_2_s1_readdata,          --                    .readdata
+			in_port    => pio_2_external_connection_export,             -- external_connection.export
+			irq        => irq_mapper_receiver2_irq                      --                 irq.irq
+		);
+
 	mm_interconnect_0 : component lab1_mm_interconnect_0
 		port map (
 			clk_0_clk_clk                                  => clk_clk,                                                     --                                clk_0_clk.clk
@@ -446,7 +528,17 @@ begin
 			pio_0_s1_write                                 => mm_interconnect_0_pio_0_s1_write,                            --                                         .write
 			pio_0_s1_readdata                              => mm_interconnect_0_pio_0_s1_readdata,                         --                                         .readdata
 			pio_0_s1_writedata                             => mm_interconnect_0_pio_0_s1_writedata,                        --                                         .writedata
-			pio_0_s1_chipselect                            => mm_interconnect_0_pio_0_s1_chipselect                        --                                         .chipselect
+			pio_0_s1_chipselect                            => mm_interconnect_0_pio_0_s1_chipselect,                       --                                         .chipselect
+			pio_1_s1_address                               => mm_interconnect_0_pio_1_s1_address,                          --                                 pio_1_s1.address
+			pio_1_s1_write                                 => mm_interconnect_0_pio_1_s1_write,                            --                                         .write
+			pio_1_s1_readdata                              => mm_interconnect_0_pio_1_s1_readdata,                         --                                         .readdata
+			pio_1_s1_writedata                             => mm_interconnect_0_pio_1_s1_writedata,                        --                                         .writedata
+			pio_1_s1_chipselect                            => mm_interconnect_0_pio_1_s1_chipselect,                       --                                         .chipselect
+			pio_2_s1_address                               => mm_interconnect_0_pio_2_s1_address,                          --                                 pio_2_s1.address
+			pio_2_s1_write                                 => mm_interconnect_0_pio_2_s1_write,                            --                                         .write
+			pio_2_s1_readdata                              => mm_interconnect_0_pio_2_s1_readdata,                         --                                         .readdata
+			pio_2_s1_writedata                             => mm_interconnect_0_pio_2_s1_writedata,                        --                                         .writedata
+			pio_2_s1_chipselect                            => mm_interconnect_0_pio_2_s1_chipselect                        --                                         .chipselect
 		);
 
 	irq_mapper : component lab1_irq_mapper
@@ -454,6 +546,8 @@ begin
 			clk           => clk_clk,                        --       clk.clk
 			reset         => rst_controller_reset_out_reset, -- clk_reset.reset
 			receiver0_irq => irq_mapper_receiver0_irq,       -- receiver0.irq
+			receiver1_irq => irq_mapper_receiver1_irq,       -- receiver1.irq
+			receiver2_irq => irq_mapper_receiver2_irq,       -- receiver2.irq
 			sender_irq    => nios2_gen2_0_irq_irq            --    sender.irq
 		);
 
@@ -594,6 +688,10 @@ begin
 	mm_interconnect_0_jtag_uart_0_avalon_jtag_slave_write_ports_inv <= not mm_interconnect_0_jtag_uart_0_avalon_jtag_slave_write;
 
 	mm_interconnect_0_pio_0_s1_write_ports_inv <= not mm_interconnect_0_pio_0_s1_write;
+
+	mm_interconnect_0_pio_1_s1_write_ports_inv <= not mm_interconnect_0_pio_1_s1_write;
+
+	mm_interconnect_0_pio_2_s1_write_ports_inv <= not mm_interconnect_0_pio_2_s1_write;
 
 	rst_controller_reset_out_reset_ports_inv <= not rst_controller_reset_out_reset;
 

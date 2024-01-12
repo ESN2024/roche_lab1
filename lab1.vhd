@@ -8,18 +8,22 @@ use IEEE.numeric_std.all;
 
 entity lab1top is
 	port (
-		clk_clk                          : in  std_logic                    := '0'; --                       clk.clk
-		pio_0_external_connection_export : out std_logic_vector(7 downto 0);        -- pio_0_external_connection.export
-		reset_reset_n                    : in  std_logic                    := '0'  --                     reset.reset_n
+		clk_clk                          : in  std_logic                    := '0';             --                       clk.clk
+		pio_0_external_connection_export : out std_logic_vector(7 downto 0);                    -- pio_0_external_connection.export
+		pio_1_external_connection_export : in  std_logic                    := '0';             -- pio_1_external_connection.export
+		pio_2_external_connection_export : in  std_logic_vector(7 downto 0) := (others => '0'); -- pio_2_external_connection.export
+		reset_reset_n                    : in  std_logic                    := '0'              --                     reset.reset_n
 	);
 end entity lab1top;
 
 architecture rtl of lab1top is
 	component lab1 is
 		port (
-			clk_clk                          : in  std_logic                    := 'X'; -- clk
-			pio_0_external_connection_export : out std_logic_vector(7 downto 0);        -- export
-			reset_reset_n                    : in  std_logic                    := 'X'  -- reset_n
+			clk_clk                          : in  std_logic                    := 'X';             -- clk
+			pio_0_external_connection_export : out std_logic_vector(7 downto 0);                    -- export
+			pio_1_external_connection_export : in  std_logic                    := 'X';             -- export
+			pio_2_external_connection_export : in  std_logic_vector(7 downto 0) := (others => 'X'); -- export
+			reset_reset_n                    : in  std_logic                    := 'X'              -- reset_n
 		);
 	end component lab1;
 begin
@@ -27,6 +31,8 @@ begin
 		port map (
 			clk_clk                          => clk_clk,                          --                       clk.clk
 			pio_0_external_connection_export => pio_0_external_connection_export, -- pio_0_external_connection.export
+			pio_1_external_connection_export => pio_1_external_connection_export, -- pio_1_external_connection.export
+			pio_2_external_connection_export => pio_2_external_connection_export, -- pio_2_external_connection.export
 			reset_reset_n                    => reset_reset_n                     --                     reset.reset_n
 		);
 end architecture rtl;
