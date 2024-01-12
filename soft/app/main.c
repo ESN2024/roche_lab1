@@ -13,7 +13,7 @@ static void irqhandler_bouton_key1(void* context, alt_u32 id)
 {
     //IOWR_ALTERA_AVALON_PIO_EDGE_CAP(PIO_1_BASE, 0x1); ici on ne reinitialise pas pour garder l irq
 
-    // Action de réponse à l'interruption
+    // Déroulement de l'irq
     if (data == 0x80){
         data = 0x01;
     }
@@ -25,12 +25,12 @@ static void irqhandler_bouton_key1(void* context, alt_u32 id)
 static void irqhandler_switch(void* context, alt_u32 id)
 {
 
-    // Action de réponse à l'interruption
+    // Déroulement de l'irq
     speed = IORD_ALTERA_AVALON_PIO_DATA(PIO_2_BASE) + 1; //+1 pour eviter le speed=0
     alt_printf("pio = %x\n", IORD_ALTERA_AVALON_PIO_DATA(PIO_2_BASE));
     alt_printf("speed = %x\n", speed);
 
-    // Réinitialiser le registre de capture de bord pour effacer l'interruption
+    // Réinitialiser le registre pour effacer l'interruption
     IOWR_ALTERA_AVALON_PIO_EDGE_CAP(PIO_2_BASE, 0x0F);
 }
 
@@ -46,11 +46,10 @@ int main()
     IOWR_ALTERA_AVALON_PIO_IRQ_MASK(PIO_2_BASE, 0x0F); //IRQ agit uniquement sur les 4 premier bits de la PIO_2
     IOWR_ALTERA_AVALON_PIO_EDGE_CAP(PIO_2_BASE, 0x0F);
 
-    // Enregistrer l'interruption
+    // Register l'interruption
     alt_irq_register(PIO_2_IRQ, NULL, irqhandler_switch);
     alt_irq_register(PIO_1_IRQ, NULL, irqhandler_bouton_key1);
 
-    // Boucle principale
     while(1) {}
 
     return 0;
