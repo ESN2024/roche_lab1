@@ -7,7 +7,7 @@
 #include "altera_avalon_pio_regs.h"
 
 volatile __uint8_t speed;
-__uint8_t data = 0x01; 
+volatile __uint8_t data = 0x01; 
 
 static void irqhandler_bouton_key1(void* context, alt_u32 id)
 {
@@ -36,7 +36,6 @@ static void irqhandler_switch(void* context, alt_u32 id)
 
 int main()
 {
-    unsigned int data = 0x01; 
     alt_printf("main() started\n");
     speed = 0x01;
     // Configurer le bouton pour générer des interruptions
@@ -52,9 +51,7 @@ int main()
     alt_irq_register(PIO_1_IRQ, NULL, irqhandler_bouton_key1);
 
     // Boucle principale
-    while(1) {
-        
-    }
+    while(1) {}
 
     return 0;
 }
