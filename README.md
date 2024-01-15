@@ -50,4 +50,4 @@ Cette interruption à un niveau de priorité supérieur à celle du chenillards.
 https://github.com/ESN2024/roche_lab1/assets/116710033/1f55b0bf-e4fa-49d8-8ce9-3df458836637
 
 ## Conclusion
-Discussion sur les problèmes de priorité des interruptions et des flags `cap edge` à 1.
+Ce projet m'a permis de me familiariser à la conception conjointe sur Quartus en utilisant un softcore Nios II. J'ai décidé de ne pas utiliser de polling pour les évènements de changement d'état du bouton et des switch mais directement passer aux interruptions car je n'étais pas bien familiarisé avec celle-ci. J'ai mis du temps à comprendre le fonctionnement du flag EDGE_CAP sur le bouton KEY1 car quand on appuie sur le bouton cela fait un front montant et quand on enlève cela fait un front descendant. J'ai programmé mon interruption sur ANY EDGE et j'ai eu du mal à comprendre comment se déclencher l'interruption du bouton.
