@@ -14,7 +14,7 @@ Le programme utilise deux types d'interruptions :
 ## Création d'un système NIOS II basique
 
 ### Schéma Fonctionnel
-![image](https://github.com/ESN2024/roche_lab1/assets/116710033/79ba5a3f-241b-4aa2-a067-5c324b09f6fc)
+![image](https://github.com/ESN2024/roche_lab1/assets/116710033/d8272612-573d-42ae-9a03-78d5e0eadf60)
 
 ### Platform Designer
 ![Capture d'écran 2024-01-12 135323](https://github.com/ESN2024/roche_lab1/assets/116710033/0fc5e62b-74dd-4033-aab1-e6cadecc4444)
